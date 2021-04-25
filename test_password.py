@@ -1,5 +1,5 @@
 import unittest
-from password import *
+from utils import *
 
 
 class PasswordTest(unittest.TestCase):

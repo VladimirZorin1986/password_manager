@@ -20,11 +20,24 @@ def encrypt_password(password: str) -> bytes:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
 
-def check_password(password: str):
+def is_valid_password(password: str):
     """
     Checks whether given password equals password from database
     """
     return bcrypt.checkpw(password.encode(), encrypt_password(password))
+
+
+def pretty_display(records: list) -> str:
+    """
+    Returns list of records in pretty format
+    """
+    format_recs = []
+    for record in records:
+        format_rec = '\n'.join(f'{attr} = {record[attr]}' for attr in record.keys())
+        format_recs.append(format_rec)
+    return '\n\n'.join(format_recs)
+
+
 
 
 
