@@ -1,6 +1,5 @@
 import unittest
-from datetime import datetime
-from db_datetime import *
+from database.db_datetime import *
 
 
 class TestDbDate(unittest.TestCase):
@@ -23,14 +22,14 @@ class TestDbDate(unittest.TestCase):
 
     def test_format_date_to_str(self):
         db_date_str = self.db_date_now.format_date_to_string()
-        self.assertEqual(db_date_str, datetime.now().strftime(self.db_date_now.PATTERN))
+        self.assertEqual(db_date_str, datetime.now().strftime(self.db_date_now.pattern))
 
     def test_format_date_to_str_exception(self):
         self.assertRaises(TypeError, self.db_date_str.format_date_to_string)
 
     def test_format_str_to_date(self):
         db_date = self.db_date_str.format_string_to_date()
-        self.assertEqual(db_date, datetime.strptime(self.db_date_str.date, self.db_date_str.PATTERN))
+        self.assertEqual(db_date, datetime.strptime(self.db_date_str.date, self.db_date_str.pattern))
 
     def test_format_str_to_date_exception(self):
         self.assertRaises(TypeError, self.db_date_now.format_string_to_date)

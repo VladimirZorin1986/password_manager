@@ -23,14 +23,14 @@ class PasswordValidator:
 
 class User:
     password = PasswordValidator()
-    db = config.DB
 
-    def __init__(self, name, password):
+    def __init__(self, name, password, db):
         self.name = name
         self.password = password
+        self.db = db
 
     def add_to_db(self):
-        self.db.save_user(self.name, self.password)
+        self.db.add_new_user(self.name, self.password)
 
     def delete_from_db(self):
         self.db.delete_user(self.name)
@@ -40,35 +40,33 @@ class User:
 
 
 class UserPasswordManager:
-    db = config.DB
 
     class AuthorizationError(Exception):
         pass
 
-    def __init__(self, name, password):
+    def __init__(self, name, password, db):
         self.user_name = name
+        self.db = db
         self._authorization(self.user_name, password)
-        self._all_resources_info = None
 
     def _authorization(self, name, password):
-        if not self.db.is_exist_user(name) and not is_valid_password(password):
+        if not self.db.is_user_exist(name) and not self.db.is_valid_password(name, password):
             raise self.AuthorizationError('invalid username/password')
+        print(f'User {name} is authorized successfully!')
+        self.db.set_user_id(name)
 
-    @property
     def all_resources_info(self):
-        if self._all_resources_info is None:
-            self._all_resources_info = self.db.get_all_resources_info(self.user_name)
-        return self._all_resources_info
+        return self.db.get_all_resources_info()
 
     def add_resource(self, resource, resource_password, comments=''):
-        self.db.save_resource(self.user_name, resource, resource_password, comments)
+        self.db.add_resource(resource, resource_password, comments)
 
     def update_resource(self, resource, new_password):
-        self.db.update(self.user_name, resource, new_password)
+        self.db.update_password(resource, new_password)
 
     def extract_resource(self, resource):
-        return self.db.retrieve(self.user_name, resource)
+        return self.db.retrieve_resource(resource)
 
     def delete_resource(self, resource):
-        self.db.delete_resource(self.user_name, resource)
+        self.db.delete_resource(resource)
 

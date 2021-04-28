@@ -27,7 +27,7 @@ def is_valid_password(password: str):
     return bcrypt.checkpw(password.encode(), encrypt_password(password))
 
 
-def pretty_display(records: list) -> str:
+def pretty_display_recs(records: list) -> str:
     """
     Returns list of records in pretty format
     """
@@ -36,6 +36,10 @@ def pretty_display(records: list) -> str:
         format_rec = '\n'.join(f'{attr} = {record[attr]}' for attr in record.keys())
         format_recs.append(format_rec)
     return '\n\n'.join(format_recs)
+
+
+def pretty_display_rec(record):
+    return '\n'.join(f'{attr} = {record[attr]}' for attr in record.keys())
 
 
 

@@ -1,9 +1,16 @@
-if __name__ == '__main__':
-    import argparse
-    from utils import create_password, pretty_display
-    import config
-    from models import User, UserPasswordManager
+from database.db_initial import init_db
+import os.path
+import argparse
+from src.utils import create_password, pretty_display_recs, pretty_display_rec
+import config
+from src.models import User, UserPasswordManager
 
+
+if not os.path.exists(config.DB_NAME):
+    init_db(config.DB_NAME)
+
+
+def parser_options(db):
     parser = argparse.ArgumentParser()
 
     # создаем группу субпарсеров для отделения создания нового юзера от существующего
@@ -42,21 +49,27 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.sub_parser == 'new_user':
-        User(args.name, args.password).add_to_db()
+        User(args.name, args.password, db).add_to_db()
+        print(f'User {args.name} with password {args.password} is registered successfully!')
     elif args.sub_parser == 'current_user':
         if not args.delete_user:
-            manager = UserPasswordManager(args.name, args.password)
+            manager = UserPasswordManager(args.name, args.password, db)
             if args.choice == 'add':
                 manager.add_resource(args.resource, args.resource_password, args.comments)
             elif args.choice == 'update':
                 manager.update_resource(args.resource, args.new_password)
             elif args.choice == 'extract':
-                manager.extract_resource(args.resource)
+                print(pretty_display_rec(manager.extract_resource(args.resource)))
             elif args.choice == 'delete':
                 manager.delete_resource(args.resource)
-            else:
-                print(pretty_display(manager.all_resources_info))
+            elif args.choice == 'list':
+                print(pretty_display_recs(manager.all_resources_info()))
         else:
-            User(args.name, args.password).delete_from_db()
+            User(args.name, args.password, db).delete_from_db()
 
-    config.DB.close_db()
+
+if __name__ == '__main__':
+    from database.sqlite_db import SqliteDatabase
+
+    with SqliteDatabase(config.DB_NAME) as db:
+        parser_options(db)
